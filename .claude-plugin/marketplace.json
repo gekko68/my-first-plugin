@@ -1,7 +1,7 @@
 {
-  "name": "TS Tools",
+  "name": "ts-tools",
   "owner": {
-    "name": "DEV Tools",
+    "name": "Timeless Systems Development Tools",
     "email": "michael@timeless-systems.com"
   },
   "license": "MIT",
