@@ -1,0 +1,8 @@
+{
+"name": "my-first-plugin",
+"description": "Ein einfaches Begrüßungs-Plugin zum Erlernen der Grundlagen",
+"version": "1.0.0",
+"author": {
+"name": "Ihr Name"
+}
+}
