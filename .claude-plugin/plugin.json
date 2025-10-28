@@ -1,14 +1,11 @@
 {
-"name": "my-first-plugin",
-"description": "Ein einfaches Begrüßungs-Plugin zum Erlernen der Grundlagen",
-"version": "1.0.0",
-"author": {
-"name": "Ihr Name"
-},
-"agents": [],
-"commands": [],
-"license": "MIT",
-"engines": {
-  "claude-code": ">=2.0.13"
-}
+  "name": "my-first-plugin",
+  "description": "Ein einfaches Begrüßungs-Plugin zum Erlernen der Grundlagen",
+  "version": "1.0.0",
+  "author": {
+    "name": "Ihr Name"
+  },
+  "agents": [],
+  "commands": [],
+  "license": "MIT"
 }
