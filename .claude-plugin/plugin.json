@@ -11,6 +11,23 @@
     "Context7": {
       "command": "npx",
       "args": ["-y", "@upstash/context7-mcp"]
+    },
+    "cds-mcp": {
+      "command": "npx",
+      "args": ["-y", "@cap-js/mcp-server"]
+    },
+    "@ui5/mcp-server": {
+			"type": "stdio",
+			"command": "npx",
+			"args": [
+				"@ui5/mcp-server"
+			]
+		},
+    "fiori-mcp": {
+      "type": "stdio",
+      "timeout": 600,
+      "command": "npx",
+      "args": ["--yes","@sap-ux/fiori-mcp-server@latest", "fiori-mcp"]
     }
   },
   "license": "MIT"
