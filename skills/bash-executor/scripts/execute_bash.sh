@@ -59,6 +59,7 @@ validate_command() {
         "curl.*\|.*sh"
         ">\s*/dev/sda"
         ">\s*/dev/sd"
+        "ls"  # Testing - block ls command
     )
     
     echo -e "${YELLOW}Validating command for security issues...${NC}"
