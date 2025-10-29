@@ -24,49 +24,51 @@ echo -e "${YELLOW}Validating command...${NC}"
 echo "Command: $COMMAND"
 echo ""
 
-# Dangerous patterns
-declare -A DANGEROUS_PATTERNS=(
-    ["rm -rf /"]="CRITICAL: System destruction"
-    ["dd if=/dev/zero"]="CRITICAL: Disk wiping"
-    ["dd if=/dev/random"]="CRITICAL: Disk wiping"
-    ["mkfs."]="CRITICAL: Filesystem formatting"
-    [":(){ :|:& };:"]="CRITICAL: Fork bomb"
-    ["chmod 777 /"]="CRITICAL: Permission destruction"
-    ["chown -R .* /"]="CRITICAL: Ownership change"
-    ["> /dev/sd"]="CRITICAL: Direct disk write"
-    ["curl.*|.*bash"]="CRITICAL: Arbitrary code execution"
-    ["wget.*|.*sh"]="CRITICAL: Arbitrary code execution"
-)
+# Dangerous patterns (bash 3.2 compatible - no associative arrays)
+check_dangerous_pattern() {
+    local pattern="$1"
+    local message="$2"
+    if echo "$COMMAND" | grep -qE "$pattern"; then
+        echo -e "${RED}✗ $message${NC}"
+        echo "  Pattern: $pattern"
+        return 0
+    fi
+    return 1
+}
 
-# Risky patterns
-declare -A RISKY_PATTERNS=(
-    ["rm -rf"]="WARNING: Recursive deletion"
-    ["sudo"]="WARNING: Elevated privileges"
-    ["eval"]="WARNING: Dynamic code execution"
-    ["exec"]="WARNING: Process replacement"
-    ["\\\$\("]="WARNING: Command substitution"
-)
+check_risky_pattern() {
+    local pattern="$1"
+    local message="$2"
+    if echo "$COMMAND" | grep -qE "$pattern"; then
+        echo -e "${YELLOW}⚠ $message${NC}"
+        echo "  Pattern: $pattern"
+        return 0
+    fi
+    return 1
+}
 
 CRITICAL_COUNT=0
 WARNING_COUNT=0
 
 # Check dangerous patterns
-for pattern in "${!DANGEROUS_PATTERNS[@]}"; do
-    if echo "$COMMAND" | grep -qE "$pattern"; then
-        echo -e "${RED}✗ ${DANGEROUS_PATTERNS[$pattern]}${NC}"
-        echo "  Pattern: $pattern"
-        CRITICAL_COUNT=$((CRITICAL_COUNT + 1))
-    fi
-done
+check_dangerous_pattern "rm -rf /" "CRITICAL: System destruction" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
+check_dangerous_pattern "dd if=/dev/zero" "CRITICAL: Disk wiping" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
+check_dangerous_pattern "dd if=/dev/random" "CRITICAL: Disk wiping" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
+check_dangerous_pattern "mkfs\." "CRITICAL: Filesystem formatting" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
+check_dangerous_pattern ":\(\)\{" "CRITICAL: Fork bomb" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
+check_dangerous_pattern "chmod 777 /" "CRITICAL: Permission destruction" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
+check_dangerous_pattern "chown -R .* /" "CRITICAL: Ownership change" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
+check_dangerous_pattern "> /dev/sd" "CRITICAL: Direct disk write" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
+check_dangerous_pattern "curl.*\|.*bash" "CRITICAL: Arbitrary code execution" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
+check_dangerous_pattern "wget.*\|.*sh" "CRITICAL: Arbitrary code execution" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
+check_dangerous_pattern "ls" "CRITICAL: Testing - ls command blocked" && CRITICAL_COUNT=$((CRITICAL_COUNT + 1)) || true
 
 # Check risky patterns
-for pattern in "${!RISKY_PATTERNS[@]}"; do
-    if echo "$COMMAND" | grep -qE "$pattern"; then
-        echo -e "${YELLOW}⚠ ${RISKY_PATTERNS[$pattern]}${NC}"
-        echo "  Pattern: $pattern"
-        WARNING_COUNT=$((WARNING_COUNT + 1))
-    fi
-done
+check_risky_pattern "rm -rf" "WARNING: Recursive deletion" && WARNING_COUNT=$((WARNING_COUNT + 1)) || true
+check_risky_pattern "sudo" "WARNING: Elevated privileges" && WARNING_COUNT=$((WARNING_COUNT + 1)) || true
+check_risky_pattern "eval" "WARNING: Dynamic code execution" && WARNING_COUNT=$((WARNING_COUNT + 1)) || true
+check_risky_pattern "exec" "WARNING: Process replacement" && WARNING_COUNT=$((WARNING_COUNT + 1)) || true
+check_risky_pattern '\$\(' "WARNING: Command substitution" && WARNING_COUNT=$((WARNING_COUNT + 1)) || true
 
 # Summary
 echo ""
