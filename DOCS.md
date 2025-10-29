@@ -14,7 +14,6 @@ https://www.npmjs.com/package/@sap-ux/fiori-mcp-server
 
 ## @cap-js/mcp-server
 
-
 ```
 https://www.npmjs.com/package/@cap-js/mcp-server
 ```

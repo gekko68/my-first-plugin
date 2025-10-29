@@ -11,3 +11,5 @@
 4. /plugin install my-first-plugin@ts-tools
 
 5. /my-first-plugin:hello
+
+## Uninstall
